@@ -1,16 +1,14 @@
 <?php
-
-/* 
+/*
    IXR - The Inutio XML-RPC Library - (c) Incutio Ltd 2002 - www.incutio.com
-   Version 1.61 - Simon Willison, 11th July 2003 (htmlentities -> htmlspecialchars)
-   
+
    Made available under the Artistic License: http://www.opensource.org/licenses/artistic-license.php
-   
+
    For the latest information, visit: http://code.google.com/p/php-ixr/
-   
+
    --[ Historical Information ]--
    Originally at - http://scripts.incutio.com/xmlrpc/
-   Original Manual at - http://scripts.incutio.com/xmlrpc/manual   
+   Original Manual at - http://scripts.incutio.com/xmlrpc/manual
 */
 
 class IXR_Value {
@@ -53,7 +51,7 @@ class IXR_Value {
         }
         // If it is a normal PHP object convert it in to a struct
         if (is_object($this->data)) {
-            
+
             $this->data = get_object_vars($this->data);
             return 'struct';
         }
@@ -271,7 +269,7 @@ class IXR_Message {
                 $this->params[] = $value;
             }
         }
-    }       
+    }
 }
 
 
@@ -392,7 +390,7 @@ EOD;
                 'specUrl' => 'http://www.xmlrpc.com/discuss/msgReader$1208',
                 'specVersion' => 1
             ),
-        );   
+        );
     }
     function getCapabilities($args) {
         return $this->capabilities;
@@ -591,7 +589,7 @@ class IXR_Error {
       </struct>
     </value>
   </fault>
-</methodResponse> 
+</methodResponse>
 
 EOD;
         return $xml;
@@ -616,15 +614,15 @@ class IXR_Date {
     }
     function parseTimestamp($timestamp) {
         $this->year = date('Y', $timestamp);
-        $this->month = date('Y', $timestamp);
-        $this->day = date('Y', $timestamp);
+        $this->month = date('m', $timestamp);
+        $this->day = date('d', $timestamp);
         $this->hour = date('H', $timestamp);
         $this->minute = date('i', $timestamp);
         $this->second = date('s', $timestamp);
     }
     function parseIso($iso) {
         $this->year = substr($iso, 0, 4);
-        $this->month = substr($iso, 4, 2); 
+        $this->month = substr($iso, 4, 2);
         $this->day = substr($iso, 6, 2);
         $this->hour = substr($iso, 9, 2);
         $this->minute = substr($iso, 12, 2);
@@ -664,27 +662,27 @@ class IXR_IntrospectionServer extends IXR_Server {
             'specVersion' => 1
         );
         $this->addCallback(
-            'system.methodSignature', 
-            'this:methodSignature', 
-            array('array', 'string'), 
+            'system.methodSignature',
+            'this:methodSignature',
+            array('array', 'string'),
             'Returns an array describing the return type and required parameters of a method'
         );
         $this->addCallback(
-            'system.getCapabilities', 
-            'this:getCapabilities', 
-            array('struct'), 
+            'system.getCapabilities',
+            'this:getCapabilities',
+            array('struct'),
             'Returns a struct describing the XML-RPC specifications supported by this server'
         );
         $this->addCallback(
-            'system.listMethods', 
-            'this:listMethods', 
-            array('array'), 
+            'system.listMethods',
+            'this:listMethods',
+            array('array'),
             'Returns an array of available methods on this server'
         );
         $this->addCallback(
-            'system.methodHelp', 
-            'this:methodHelp', 
-            array('string', 'string'), 
+            'system.methodHelp',
+            'this:methodHelp',
+            array('string', 'string'),
             'Returns a documentation string for the specified method'
         );
     }
