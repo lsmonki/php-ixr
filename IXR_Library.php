@@ -6,7 +6,7 @@
  * @since 1.5
  *
  * @copyright  Incutio Ltd 2002-2008 (http://www.incutio.com)
- * @version    1.8 (beta) 23rd November 2008
+ * @version    1.7.2 (beta) 23rd November 2008
  * @author     Simon Willison
  * @link       http://scripts.incutio.com/xmlrpc/ Site/manual
  * @link       http://code.google.com/p/php-ixr/ Latest version
