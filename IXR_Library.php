@@ -8,9 +8,9 @@
  * @copyright  Incutio Ltd 2002-2008 (http://www.incutio.com)
  * @version    1.8 (beta) 23rd November 2008
  * @author     Simon Willison
- * @link       http://scripts.incutio.com/xmlrpc/ Site
- * @link       http://code.google.com/p/php-ixr/ Latest
- * @license    BSD License http://www.opensource.org/licenses/bsd-license.php
+ * @link       http://scripts.incutio.com/xmlrpc/ Site/manual
+ * @link       http://code.google.com/p/php-ixr/ Latest version
+ * @license    Artistic License http://www.opensource.org/licenses/artistic-license.php
  */
 
 class IXR_Value
@@ -324,11 +324,17 @@ class IXR_Server
 	function serve($data = false)
 	{
 		if (!$data) {
-			global $HTTP_RAW_POST_DATA;
-			if (!$HTTP_RAW_POST_DATA) {
+			if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'POST') {
 				die('XML-RPC server accepts POST requests only.');
 			}
-			$data = $HTTP_RAW_POST_DATA;
+
+			global $HTTP_RAW_POST_DATA;
+			if (empty($HTTP_RAW_POST_DATA)) {
+				// workaround for a bug in PHP 5.2.2 - http://bugs.php.net/bug.php?id=41293
+				$data = file_get_contents('php://input');
+			} else {
+				$data = $HTTP_RAW_POST_DATA;
+			}
 		}
 		$this->message = new IXR_Message($data);
 		if (!$this->message->parse()) {
