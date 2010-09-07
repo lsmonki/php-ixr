@@ -2,16 +2,42 @@
 /**
  * IXR - The Incutio XML-RPC Library
  *
+ * Copyright (c) 2010, Incutio Ltd.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  - Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  - Neither the name of Incutio Ltd. nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  * @package IXR
  * @since 1.5
  *
- * @copyright  Incutio Ltd 2002-2008 (http://www.incutio.com)
- * @version    1.7.2 (beta) 23rd November 2008
+ * @copyright  Incutio Ltd 2010 (http://www.incutio.com)
+ * @version    1.7.3 7th September 2010
  * @author     Simon Willison
  * @link       http://scripts.incutio.com/xmlrpc/ Site/manual
- * @link       http://code.google.com/p/php-ixr/ Latest version
- * @license    Artistic License http://www.opensource.org/licenses/artistic-license.php
  */
+
 
 class IXR_Value
 {
@@ -680,6 +706,12 @@ class IXR_Client
 }
 
 
+/**
+ * IXR_Error
+ *
+ * @package IXR
+ * @since 1.5
+ */
 class IXR_Error
 {
 	var $code;
@@ -822,27 +854,27 @@ class IXR_IntrospectionServer extends IXR_Server
 		$this->addCallback(
             'system.methodSignature',
             'this:methodSignature',
-		array('array', 'string'),
+            array('array', 'string'),
             'Returns an array describing the return type and required parameters of a method'
-            );
-            $this->addCallback(
+        );
+        $this->addCallback(
             'system.getCapabilities',
             'this:getCapabilities',
             array('struct'),
             'Returns a struct describing the XML-RPC specifications supported by this server'
-            );
-            $this->addCallback(
+        );
+        $this->addCallback(
             'system.listMethods',
             'this:listMethods',
             array('array'),
             'Returns an array of available methods on this server'
-            );
-            $this->addCallback(
+        );
+        $this->addCallback(
             'system.methodHelp',
             'this:methodHelp',
             array('string', 'string'),
             'Returns a documentation string for the specified method'
-            );
+        );
 	}
 
 	function addCallback($method, $callback, $args, $help)
@@ -1003,6 +1035,7 @@ class IXR_ClientMulticall extends IXR_Client
  * @author Jason Stirk <jstirk@gmm.com.au> (@link http://blog.griffin.homelinux.org/projects/xmlrpc/)
  * @version 0.2.0 26May2005 08:34 +0800
  * @copyright (c) 2004-2005 Jason Stirk
+ * @package IXR
  */
 class IXR_ClientSSL extends IXR_Client
 {
@@ -1065,22 +1098,16 @@ class IXR_ClientSSL extends IXR_Client
 	 */
 	function setCertificate($certificateFile, $keyFile, $keyPhrase='')
 	{
-		//Check the files all exist
-		if (is_file($certificateFile))
-		{
-			$this->_certFile=$certificateFile;
-		}
-		else
-		{
+		// Check the files all exist
+		if (is_file($certificateFile)) {
+			$this->_certFile = $certificateFile;
+		} else {
 			die('Could not open certificate: ' . $certificateFile);
 		}
 
-		if (is_file($keyFile))
-		{
-			$this->_keyFile=$keyFile;
-		}
-		else
-		{
+		if (is_file($keyFile)) {
+			$this->_keyFile = $keyFile;
+		} else {
 			die('Could not open private key: ' . $keyFile);
 		}
 
@@ -1089,12 +1116,9 @@ class IXR_ClientSSL extends IXR_Client
 
 	function setCACertificate($caFile)
 	{
-		if (is_file($caFile))
-		{
-			$this->_caFile=$caFile;
-		}
-		else
-		{
+		if (is_file($caFile)) {
+			$this->_caFile = $caFile;
+		} else {
 			die('Could not open CA certificate: ' . $caFile);
 		}
 	}
@@ -1107,7 +1131,7 @@ class IXR_ClientSSL extends IXR_Client
 	 */
 	function setTimeOut($newTimeOut)
 	{
-		$this->timeout=(int)$newTimeOut;
+		$this->timeout = (int)$newTimeOut;
 	}
 
 	/**
@@ -1149,8 +1173,7 @@ class IXR_ClientSSL extends IXR_Client
 		//Since 23Jun2004 (0.1.2) - Made timeout a class field
 		curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
 
-		if ($this->debug)
-		{
+		if ($this->debug) {
 			curl_setopt($curl, CURLOPT_VERBOSE, 1);
 		}
 
@@ -1162,44 +1185,37 @@ class IXR_ClientSSL extends IXR_Client
 									"Content-Type: text/xml",
 									"Content-length: {$length}"));
 
-		//Process the SSL certificates, etc. to use
-		if (!($this->_certFile === false))
-		{
-			//We have a certificate file set, so add these to the cURL handler
+		// Process the SSL certificates, etc. to use
+		if (!($this->_certFile === false)) {
+			// We have a certificate file set, so add these to the cURL handler
 			curl_setopt($curl, CURLOPT_SSLCERT, $this->_certFile);
 			curl_setopt($curl, CURLOPT_SSLKEY, $this->_keyFile);
 
-			if ($this->debug)
-			{
+			if ($this->debug) {
 				echo "SSL Cert at : " . $this->_certFile . "\n";
 				echo "SSL Key at : " . $this->_keyFile . "\n";
 			}
 
-			//See if we need to give a passphrase
-			if (!($this->_passphrase === ''))
-			{
+			// See if we need to give a passphrase
+			if (!($this->_passphrase === '')) {
 				curl_setopt($curl, CURLOPT_SSLCERTPASSWD, $this->_passphrase);
 			}
 
-			if ($this->_caFile === false)
-			{
-				//Don't verify their certificate, as we don't have a CA to verify against
+			if ($this->_caFile === false) {
+				// Don't verify their certificate, as we don't have a CA to verify against
 				curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-			}
-			else
-			{
-				//Verify against a CA
+			} else {
+				// Verify against a CA
 				curl_setopt($curl, CURLOPT_CAINFO, $this->_caFile);
 			}
 		}
 
-		//Call cURL to do it's stuff and return us the content
-		$contents=curl_exec($curl);
+		// Call cURL to do it's stuff and return us the content
+		$contents = curl_exec($curl);
 		curl_close($curl);
 
-		//Check for 200 Code in $contents
-		if (!strstr($contents, '200 OK'))
-		{
+		// Check for 200 Code in $contents
+		if (!strstr($contents, '200 OK')) {
 			//There was no "200 OK" returned - we failed
 			$this->error = new IXR_Error(-32300, 'transport error - HTTP status code was not 200');
 			return false;
@@ -1209,10 +1225,10 @@ class IXR_ClientSSL extends IXR_Client
 			echo '<pre>'.htmlspecialchars($contents)."\n</pre>\n\n";
 		}
 		// Now parse what we've got back
-		//Since 20Jun2004 (0.1.1) - We need to remove the headers first
-		//Why I have only just found this, I will never know...
-		//So, remove everything before the first <
-		$contents=substr($contents,strpos($contents, '<'));
+		// Since 20Jun2004 (0.1.1) - We need to remove the headers first
+		// Why I have only just found this, I will never know...
+		// So, remove everything before the first <
+		$contents = substr($contents,strpos($contents, '<'));
 
 		$this->message = new IXR_Message($contents);
 		if (!$this->message->parse()) {
@@ -1243,7 +1259,7 @@ class IXR_ClientSSL extends IXR_Client
  * @author Jason Stirk <jstirk@gmm.com.au>
  * @version 1.0.1 19Apr2005 17:40 +0800
  * @copyright Copyright (c) 2005 Jason Stirk
- * @package IXR_Library
+ * @package IXR
  */
 class IXR_ClassServer extends IXR_Server
 {
