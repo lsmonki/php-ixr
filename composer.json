@@ -8,7 +8,7 @@
     "authors": [
         {
             "name": "Incutio Ltd 2010 - Simon Willison",
-            "homepage": "http://scripts.incutio.com/xmlrpc/",
+            "homepage": "http://scripts.incutio.com/xmlrpc/"
         }
     ],
     "require": {
