@@ -15,3 +15,22 @@ Don't however be fooled by it's simple surface. The library includes a wide vari
 #Background / History
 
 The original XML-RPC library was developed back in 2002 and updated through 2003 by Incutio for a number of projects the company was working on at the time. It has become fairly dated but is still used extensively by a wide range of commercial and open-source projects.
+
+#Composer
+
+A [Composer](http://getcomposer.org/) file has been added to this repository.
+
+As I'm not the original developer, this package is not published to [Packagist](https://packagist.org/), to use it simply add
+
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/lsmonki/php-ixr"
+        }
+    ],
+
+    "require": {
+        "lsmonki/php-ixr": "1.7.*"
+    }
+
+To your composer.json file
