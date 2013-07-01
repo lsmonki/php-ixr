@@ -2,7 +2,9 @@
 
 **Note**: _This is a fork of the original Incutio XML-RPC library (IXR) SVN repo hosted on <https://code.google.com/p/php-ixr/>_
 
-All credits go to Incutio: <http://scripts.incutio.com/xmlrpc/>
+All credits go to Incutio.
+
+**Docs and Homepage:** <http://scripts.incutio.com/xmlrpc/>
 
 #Introduction
 
