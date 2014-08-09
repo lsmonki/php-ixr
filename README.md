@@ -20,7 +20,7 @@ The original XML-RPC library was developed back in 2002 and updated through 2003
 
 A [Composer](http://getcomposer.org/) file has been added to this repository.
 
-As I'm not the original developer, this package is not published to [Packagist](https://packagist.org/), to use it simply add
+This package is published to [Packagist](https://packagist.org/), but if you don't want to use it simply add
 
     "repositories": [
         {
