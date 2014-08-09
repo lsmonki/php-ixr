@@ -30,17 +30,22 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  *
  * @copyright  Incutio Ltd 2010 (http://www.incutio.com)
  * @version    1.7.4 7th September 2010
  * @author     Simon Willison
  * @link       http://scripts.incutio.com/xmlrpc/ Site/manual
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD
  */
 
-
-class IXR_Value
-{
+/**
+ * IXR_Value
+ *
+ * @package IXR
+ * @since 1.5.0
+ */
+class IXR_Value {
     var $data;
     var $type;
 
@@ -128,6 +133,7 @@ class IXR_Value
             case 'struct':
                 $return = '<struct>'."\n";
                 foreach ($this->data as $name => $value) {
+                    $name = htmlspecialchars($name);
                     $return .= "  <member><name>$name</name><value>";
                     $return .= $value->getXml()."</value></member>\n";
                 }
@@ -165,7 +171,7 @@ class IXR_Value
  * IXR_MESSAGE
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  *
  */
 class IXR_Message
@@ -197,11 +203,34 @@ class IXR_Message
     {
         // first remove the XML declaration
         // merged from WP #10698 - this method avoids the RAM usage of preg_replace on very large messages
-        $header = preg_replace( '/<\?xml.*?\?'.'>/', '', substr($this->message, 0, 100), 1);
-        $this->message = substr_replace($this->message, $header, 0, 100);
-        if (trim($this->message) == '') {
+        $header = preg_replace( '/<\?xml.*?\?'.'>/s', '', substr( $this->message, 0, 100 ), 1 );
+        $this->message = trim( substr_replace( $this->message, $header, 0, 100 ) );
+        if ( '' == $this->message ) {
             return false;
         }
+
+        // Then remove the DOCTYPE
+        $header = preg_replace( '/^<!DOCTYPE[^>]*+>/i', '', substr( $this->message, 0, 200 ), 1 );
+        $this->message = trim( substr_replace( $this->message, $header, 0, 200 ) );
+        if ( '' == $this->message ) {
+            return false;
+        }
+
+        // Check that the root tag is valid
+        $root_tag = substr( $this->message, 0, strcspn( substr( $this->message, 0, 20 ), "> \t\r\n" ) );
+        if ( '<!DOCTYPE' === strtoupper( $root_tag ) ) {
+            return false;
+        }
+        if ( ! in_array( $root_tag, array( '<methodCall', '<methodResponse', '<fault' ) ) ) {
+            return false;
+        }
+
+        // Bail if there are too many elements to parse
+        $element_limit = 30000;
+        if ( $element_limit && 2 * $element_limit < substr_count( $this->message, '<' ) ) {
+            return false;
+        }
+
         $this->_parser = xml_parser_create();
         // Set XML parser to take the case of tags in to account
         xml_parser_set_option($this->_parser, XML_OPTION_CASE_FOLDING, false);
@@ -210,8 +239,8 @@ class IXR_Message
         xml_set_element_handler($this->_parser, 'tag_open', 'tag_close');
         xml_set_character_data_handler($this->_parser, 'cdata');
         $chunk_size = 262144; // 256Kb, parse in chunks to avoid the RAM usage on very large messages
+        $final = false;
         do {
-            $final = false;
             if (strlen($this->message) <= $chunk_size) {
                 $final = true;
             }
@@ -244,7 +273,7 @@ class IXR_Message
             case 'fault':
                 $this->messageType = $tag;
                 break;
-                /* Deal with stacks of arrays and structs */
+            /* Deal with stacks of arrays and structs */
             case 'data':    // data is to all intents and puposes more interesting than array
                 $this->_arraystructstypes[] = 'array';
                 $this->_arraystructs[] = array();
@@ -297,7 +326,7 @@ class IXR_Message
                 $value = base64_decode($this->_currentTagContents);
                 $valueFlag = true;
                 break;
-                /* Deal with stacks of arrays and structs */
+            /* Deal with stacks of arrays and structs */
             case 'data':
             case 'struct':
                 $value = array_pop($this->_arraystructs);
@@ -338,7 +367,7 @@ class IXR_Message
  * IXR_Server
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  */
 class IXR_Server
 {
@@ -363,7 +392,7 @@ class IXR_Server
     {
         if (!$data) {
             if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'POST') {
-            	header('Content-Type: text/plain'); // merged from WP #9093
+                header('Content-Type: text/plain'); // merged from WP #9093
                 die('XML-RPC server accepts POST requests only.');
             }
 
@@ -406,8 +435,8 @@ class IXR_Server
 </methodResponse>
 
 EOD;
-      // Send it
-      $this->output($xml);
+        // Send it
+        $this->output($xml);
     }
 
     function call($methodname, $args)
@@ -436,7 +465,7 @@ EOD;
         } else {
             // It's a function - does it exist?
             if (is_array($method)) {
-                if (!method_exists($method[0], $method[1])) {
+                if (!is_callable(array($method[0], $method[1]))) {
                     return new IXR_Error(-32601, 'server error. requested object method "'.$method[1].'" does not exist.');
                 }
             } else if (!function_exists($method)) {
@@ -482,15 +511,15 @@ EOD;
             'xmlrpc' => array(
                 'specUrl' => 'http://www.xmlrpc.com/spec',
                 'specVersion' => 1
-        ),
+            ),
             'faults_interop' => array(
                 'specUrl' => 'http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php',
                 'specVersion' => 20010516
-        ),
+            ),
             'system.multicall' => array(
                 'specUrl' => 'http://www.xmlrpc.com/discuss/msgReader$1208',
                 'specVersion' => 1
-        ),
+            ),
         );
     }
 
@@ -542,7 +571,7 @@ EOD;
  * IXR_Request
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  */
 class IXR_Request
 {
@@ -585,7 +614,7 @@ EOD;
  * IXR_Client
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  *
  */
 class IXR_Client
@@ -598,6 +627,7 @@ class IXR_Client
     var $message = false;
     var $debug = false;
     var $timeout;
+    var $headers = array();
 
     // Storage place for an error message
     var $error = false;
@@ -614,6 +644,10 @@ class IXR_Client
             // Make absolutely sure we have a path
             if (!$this->path) {
                 $this->path = '/';
+            }
+
+            if ( ! empty( $bits['query'] ) ) {
+                $this->path .= '?' . $bits['query'];
             }
         } else {
             $this->server = $server;
@@ -680,11 +714,11 @@ class IXR_Client
                 $gettingHeaders = false;
             }
             if (!$gettingHeaders) {
-            	// merged from WP #12559 - remove trim
+                // merged from WP #12559 - remove trim
                 $contents .= $line;
             }
             if ($this->debug) {
-            	$debugContents .= $line;
+                $debugContents .= $line;
             }
         }
         if ($this->debug) {
@@ -736,7 +770,7 @@ class IXR_Client
  * IXR_Error
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  */
 class IXR_Error
 {
@@ -778,7 +812,7 @@ EOD;
  * IXR_Date
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  */
 class IXR_Date {
     var $year;
@@ -841,7 +875,7 @@ class IXR_Date {
  * IXR_Base64
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  */
 class IXR_Base64
 {
@@ -862,7 +896,7 @@ class IXR_Base64
  * IXR_IntrospectionServer
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  */
 class IXR_IntrospectionServer extends IXR_Server
 {
@@ -1025,7 +1059,7 @@ class IXR_IntrospectionServer extends IXR_Server
  * IXR_ClientMulticall
  *
  * @package IXR
- * @since 1.5
+ * @since 1.5.0
  */
 class IXR_ClientMulticall extends IXR_Client
 {
@@ -1208,8 +1242,8 @@ class IXR_ClientSSL extends IXR_Client
         curl_setopt($curl, CURLOPT_POSTFIELDS, $xml);
         curl_setopt($curl, CURLOPT_PORT, $this->port);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                                    "Content-Type: text/xml",
-                                    "Content-length: {$length}"));
+            "Content-Type: text/xml",
+            "Content-length: {$length}"));
 
         // Process the SSL certificates, etc. to use
         if (!($this->_certFile === false)) {
