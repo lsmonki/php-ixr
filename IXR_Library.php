@@ -1257,7 +1257,10 @@ class IXR_ClientSSL extends IXR_Client
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         //Since 23Jun2004 (0.1.2) - Made timeout a class field
-        curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $this->timeout);
+        if (null !== $this->timeout_io) {
+            curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout_io);
+        }
 
         if ($this->debug) {
             curl_setopt($curl, CURLOPT_VERBOSE, 1);
