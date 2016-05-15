@@ -1,3 +1,11 @@
+#OBSOLETE REPO
+
+This repository is marked as obsolete. Use this one instead:
+
+https://github.com/kissifrot/php-ixr
+
+-------
+
 #Incutio XML-RPC library (IXR)
 
 **Note**: _This is a fork of the original Incutio XML-RPC library (IXR) SVN repo hosted on <https://code.google.com/p/php-ixr/>_
